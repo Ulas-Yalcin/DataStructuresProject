@@ -3,31 +3,26 @@
 #include <string.h>
 #define Max 25
 #include <time.h>
-
-int b = 0;              // kargo_id iC'in sayaC'
-int musteri_sayaci = 1; // musteri_id iC'in sayaC'
-
+int b = 0;             
+int musteri_sayaci = 1; 
 struct Rota {
   int sehir_id;
   char sehir_adi[50];
 };
-
 struct Kargo {
   int kargo_id;
-  char kargo_teslim_tarihi[9]; // 20240505
-  char kargo_durum[50];        // Teslim edildi, Teslim edilemedi
+  char kargo_teslim_tarihi[9]; 
+  char kargo_durum[50];        
   int kargo_suresi;
   struct Rota rota;
   struct Kargo *next;
 };
-
 struct Musteri {
   int musteri_id;
   char musteri_adi_soyadi[50];
   struct Kargo *kargo_listesi;
   struct Musteri *next;
 };
-
 typedef struct CityNode {
   int cityID;
   char cityName[50];
@@ -42,7 +37,6 @@ CityNode *city_insert(int cityID, const char *cityName) {
   newCity->nextSibling = NULL;
   return newCity;
 }
-
 void city_connect(CityNode *parent, CityNode *newCity) {
   if (parent->firstChild == NULL) {
     parent->firstChild = newCity;
@@ -54,16 +48,13 @@ void city_connect(CityNode *parent, CityNode *newCity) {
     current->nextSibling = newCity;
   }
 }
-
 int findShortestPath(CityNode *root, int targetCityID) {
   if (root == NULL)
     return -1;
   if (root->cityID == targetCityID)
     return 0;
-
   int minDepth = -1;
   CityNode *child = root->firstChild;
-
   while (child != NULL) {
     int depth = findShortestPath(child, targetCityID);
     if (depth != -1) {
@@ -73,38 +64,29 @@ int findShortestPath(CityNode *root, int targetCityID) {
     }
     child = child->nextSibling;
   }
-
   return minDepth;
 }
-
 void printRoutesHelper(CityNode *node, int depth) {
   if (node == NULL)
     return;
-
   for (int i = 0; i < depth; i++) {
     printf("  ");
   }
-  printf("└─ %s (ID: %d)\n", node->cityName, node->cityID);
-
+  printf(" %s (ID: %d)\n", node->cityName, node->cityID);
   printRoutesHelper(node->firstChild, depth + 1);
   printRoutesHelper(node->nextSibling, depth);
 }
-
 void routesPrint(CityNode *root) {
-  printf("Delivery Routes:\n");
+  printf("teslimat rotasi:\n");
   printRoutesHelper(root, 0);
 }
-
 CityNode *routesLoad() {
-
-  // Delivery Tree example
   CityNode *headquarters = city_insert(1, "ankara-merkez");
   CityNode *city1 = city_insert(2, "istanbul");
   CityNode *city2 = city_insert(3, "izmir");
   CityNode *city3 = city_insert(4, "antalya");
   CityNode *city4 = city_insert(5, "trabzon");
   CityNode *city5 = city_insert(6, "erzurum");
-
   CityNode *city_alt1 = city_insert(8, "kocaeli");
   CityNode *city_alt2 = city_insert(9, "edirne");
   CityNode *city_alt3 = city_insert(10, "malatya");
@@ -115,7 +97,6 @@ CityNode *routesLoad() {
   CityNode *city_alt8 = city_insert(15, "ordu");
   CityNode *city_alt9 = city_insert(16, "agri");
   CityNode *city_alt10 = city_insert(17, "adiyaman");
-
   city_connect(headquarters, city1);
   city_connect(headquarters, city2);
   city_connect(headquarters, city3);
@@ -131,10 +112,8 @@ CityNode *routesLoad() {
   city_connect(city4, city_alt8);
   city_connect(city5, city_alt9);
   city_connect(city5, city_alt10);
-
   return headquarters;
 }
-
 int cityExists(CityNode *root, const char *cityName) {
   if (root == NULL) {
     return 0;
@@ -150,7 +129,6 @@ int cityExists(CityNode *root, const char *cityName) {
   }
   return 0;
 }
-
 int find_city_id(CityNode *root, const char *cityName) {
   if (root == NULL) {
     return -1;
@@ -168,42 +146,35 @@ typedef struct stack {
   int top;
   struct Kargo *item[Max];
 } st;
-
 void createEmptyStack(st *s) { s->top = -1; }
-
 int isfull(st *s) { return s->top == Max - 1; }
-
 int isempty(st *s) { return s->top == -1; }
-
 void push(st *s, struct Kargo *kargo) {
   if (isfull(s)) {
-    printf("Stack dolu, daha fazla kargo gC6nderemezsiniz.\n");
+    printf("Stack dolu, daha fazla kargo gonderemezsiniz.\n");
   } else {
     s->top++;
     s->item[s->top] = kargo;
-    printf("Kargo baEarD1yla eklendi.\n");
+    printf("Kargo basariyla eklendi.\n");
   }
 }
-
 void pop(st *s) {
   if (isempty(s)) {
-    printf("\nStack boE.\n");
+    printf("\nStack bos.\n");
   } else {
-    printf("Kargo ID: %d C'D1kartD1ldD1.\n", s->item[s->top]->kargo_id);
+    printf("Kargo ID: %d cikartildi.\n", s->item[s->top]->kargo_id);
     s->top--;
   }
 }
-
 void printLastFive(st *s) {
   printf("\nSon 5 Kargo:\n");
   int start = s->top - 4 >= 0 ? s->top - 4 : 0;
   for (int i = s->top; i >= start; i--) {
-    printf("Kargo ID: %d, Gönderi6 Tarihi: %s, Durum: %s, Eehir: %s\n",
+    printf("Kargo ID: %d, Gonderi Tarihi: %s, Durum: %sehir: %s\n",
            s->item[i]->kargo_id, s->item[i]->kargo_teslim_tarihi,
            s->item[i]->kargo_durum, s->item[i]->rota.sehir_adi);
   }
 }
-
 struct Musteri *yeni_musteri(const char *musteri_adi_soyadi) {
   struct Musteri *musteri = (struct Musteri *)malloc(sizeof(struct Musteri));
   musteri->musteri_id = musteri_sayaci++;
@@ -212,15 +183,12 @@ struct Musteri *yeni_musteri(const char *musteri_adi_soyadi) {
   musteri->next = NULL;
   return musteri;
 }
-
 struct Kargo *merge(struct Kargo *first, struct Kargo *second) {
   if (first == NULL)
     return second;
   if (second == NULL)
     return first;
-
   struct Kargo *result = NULL;
-
   if (first->kargo_suresi <= second->kargo_suresi) {
     result = first;
     result->next = merge(first->next, second);
@@ -230,13 +198,11 @@ struct Kargo *merge(struct Kargo *first, struct Kargo *second) {
   }
   return result;
 }
-
 void split(struct Kargo *source, struct Kargo **front, struct Kargo **back) {
   struct Kargo *fast;
   struct Kargo *slow;
   slow = source;
   fast = source->next;
-
   while (fast != NULL) {
     fast = fast->next;
     if (fast != NULL) {
@@ -244,28 +210,22 @@ void split(struct Kargo *source, struct Kargo **front, struct Kargo **back) {
       fast = fast->next;
     }
   }
-
   *front = source;
   *back = slow->next;
   slow->next = NULL;
 }
-
 void mergeSort(struct Kargo **headRef) {
   struct Kargo *head = *headRef;
   struct Kargo *a;
   struct Kargo *b;
-
   if ((head == NULL) || (head->next == NULL)) {
     return;
   }
-
   split(head, &a, &b);
   mergeSort(&a);
   mergeSort(&b);
-
   *headRef = merge(a, b);
 }
-
 struct Kargo *yeni_kargo(const char *teslim_tarihi, const char *durum,
                          int suresi, int sehir_id, const char *sehir_adi) {
   struct Kargo *kargo = (struct Kargo *)malloc(sizeof(struct Kargo));
@@ -278,18 +238,16 @@ struct Kargo *yeni_kargo(const char *teslim_tarihi, const char *durum,
   kargo->next = NULL;
   return kargo;
 }
-
 void Menu(void) {
-  printf("\nYapmak istediDiniz iElemi aEaDD1daki menC<den seC'iniz:\n");
-  printf("1. Yeni mC<Eteri ekle\n");
-  printf("2. Kargo gC6nderimi ekle\n");
+  printf("\nYapmak istediginiz islemi asagidaki menuden seciniz:\n");
+  printf("1. Yeni musteri ekle\n");
+  printf("2. Kargo gonderimi ekle\n");
   printf("3. Kargo durumu sorgula\n");
-  printf("4. GC6nderim geC'miEini gC6rC<ntC<le\n");
-  printf("5. TC<m kargolarD1 listele\n");
-  printf("6. Teslimat rotalarD1nD1 gC6ster\n");
-  printf("7. C D1kD1E yap\n");
+  printf("4. Gonderim gecmisini goruntule\n");
+  printf("5. Tum kargolari listele\n");
+  printf("6. Teslimat rotalarini goster\n");
+  printf("7. Cikis yap\n");
 };
-
 struct Musteri *musteri_bul_isim(struct Musteri *head,
                                  const char *aranan_isim) {
   struct Musteri *current = head;
@@ -301,7 +259,6 @@ struct Musteri *musteri_bul_isim(struct Musteri *head,
   }
   return NULL;
 }
-
 struct Musteri *musteri_bul(struct Musteri *musteriler,
                             const char *musteri_adi_soyadi) {
   struct Musteri *current = musteriler;
@@ -314,250 +271,237 @@ struct Musteri *musteri_bul(struct Musteri *musteriler,
   return NULL;
 };
 
+int compare(const void *a, const void *b) {
+  struct Kargo *kargoA = *(struct Kargo **)a;
+  struct Kargo *kargoB = *(struct Kargo **)b;
+  return (kargoA->kargo_id - kargoB->kargo_id);
+}
+
+struct Kargo *binarySearch(st *s, int kargo_id) {
+  int left = 0, right = s->top;
+  while (left <= right) {
+    int mid = left + (right - left) / 2;
+    if (s->item[mid]->kargo_id == kargo_id) {
+      return s->item[mid];
+    }
+    if (s->item[mid]->kargo_id < kargo_id) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+  return NULL;
+}
+
 int main() {
   int choice;
   struct Musteri *musteriler = NULL;
   st kargo_stack;
   createEmptyStack(&kargo_stack);
   CityNode *routes = routesLoad();
-
-  printf("HoE geldiniz!\n");
+  printf("Hos geldiniz!\n");
   do {
     Menu();
-    printf("SeC'iminiz: ");
+    printf("Seciminiz: ");
     scanf("%d", &choice);
-
     switch (choice) {
-    case 1: {
-      char musteri_adi_soyadi[50];
-      printf("MC<Eteri adD1 soyadD1: ");
-      scanf(" %[^\n]", musteri_adi_soyadi);
-      struct Musteri *yeni = yeni_musteri(musteri_adi_soyadi);
-      yeni->next = musteriler;
-      musteriler = yeni;
-      printf("MC<Eteri baEarD1yla eklendi!\n");
-      break;
-    }
-    case 2: {
-      char musteri_adi_soyadi[50];
-      printf("MC<Eteri adD1 soyadD1: ");
-      scanf(" %[^\n]", musteri_adi_soyadi);
-      struct Musteri *musteri = musteri_bul(musteriler, musteri_adi_soyadi);
-      if (musteri == NULL) {
-        printf("musteri bulunamadı");
+      case 1: {
+        char musteri_adi_soyadi[50];
+        printf("Musteri adi soyadi: ");
+        scanf(" %s", musteri_adi_soyadi);
+        struct Musteri *yeni = yeni_musteri(musteri_adi_soyadi);
+        yeni->next = musteriler;
+        musteriler = yeni;
+        printf("Musteri basariyla eklendi!\n");
         break;
       }
-
-      char teslim_tarihi[9], durum[50], sehir_adi[50];
-      int suresi, sehir_id;
-      printf("Kargo teslim tarihi (YYYYMMDD): ");
-      scanf("%s", teslim_tarihi);
-      srand(time(NULL));                  // Initialize random seed
-      int durum_secim = (rand() % 3) + 1; // Random number between 1-3
-      if (durum_secim == 1) {
-        strcpy(durum, "İşleme Alındı");
-      } else if (durum_secim == 2) {
-        strcpy(durum, "Teslimatta");
-      } else {
-        strcpy(durum, "Teslim Edildi");
-      }
-
-      while (1) {
-        printf("Kargo RotasD1 (Eehir): ");
-        scanf("%s", sehir_adi);
-
-        if (cityExists(routes, sehir_adi)) {
-          sehir_id = find_city_id(routes, sehir_adi);
+      case 2: {
+        char musteri_adi_soyadi[50];
+        printf("Musteri adi soyadi: ");
+        scanf(" %s", musteri_adi_soyadi);
+        struct Musteri *musteri = musteri_bul(musteriler, musteri_adi_soyadi);
+        if (musteri == NULL) {
+          printf("Musteri bulunamadi.\n");
           break;
+        }
+        char teslim_tarihi[9], durum[50], sehir_adi[50];
+        int suresi, sehir_id;
+        printf("Kargo teslim tarihi (YYYYMMDD): ");
+        scanf("%s", teslim_tarihi);
+        srand(time(NULL));
+        int durum_secim = (rand() % 3) + 1;
+        if (durum_secim == 1) {
+          strcpy(durum, "İsleme Alindi");
+        } else if (durum_secim == 2) {
+          strcpy(durum, "Teslimatta");
         } else {
-          printf("Hata: Girilen Eehir rota aDacD1nda bulunamadD1!\n");
-          printf("Mevcut Eehirler:\n");
-          routesPrint(routes); // Show available cities
-          printf("LC<tfen listeden geC'erli bir Eehir giriniz.\n");
+          strcpy(durum, "Teslim Edildi");
         }
-      }
-
-      suresi = findShortestPath(routes, sehir_id);
-
-      struct Kargo *yeni_k =
-          yeni_kargo(teslim_tarihi, durum, suresi, sehir_id, sehir_adi);
-      push(&kargo_stack, yeni_k);
-      if (musteri->kargo_listesi == NULL) {
-        musteri->kargo_listesi = yeni_k;
-      } else {
-        // Add to beginning of list
-        yeni_k->next = musteri->kargo_listesi;
-        musteri->kargo_listesi = yeni_k;
-      }
-
-      break;
-    }
-    case 3: {
-      char musteri_adi_soyadi[50];
-      int kargo_id;
-      int found = 0;
-
-      printf("Müşteri adı soyadı: ");
-      scanf(" %[^\n]", musteri_adi_soyadi);
-
-      // First check if customer exists
-      struct Musteri *musteri = musteri_bul(musteriler, musteri_adi_soyadi);
-      if (musteri == NULL) {
-        printf("Müşteri bulunamadı.\n");
-        break;
-      }
-
-      printf("Kargo ID: ");
-      scanf("%d", &kargo_id);
-
-      if (isempty(&kargo_stack)) {
-        printf("Hiç kargo bulunmamaktadır.\n");
-      } else {
-        for (int i = 0; i <= kargo_stack.top; i++) {
-          struct Kargo *current = kargo_stack.item[i];
-          if (current->kargo_id == kargo_id) {
-            found = 1;
-            printf("\nKargo Durumu:\n");
-            printf("Müşteri: %s\n", musteri_adi_soyadi);
-            printf("Kargo ID: %d\n", current->kargo_id);
-            printf("Gönderi Tarihi: %s\n", current->kargo_teslim_tarihi);
-            printf("Durum: %s\n", current->kargo_durum);
-            printf("Şehir: %s\n", current->rota.sehir_adi);
-            printf("Teslimat Süresi: %d gün\n", current->kargo_suresi);
+        while (1) {
+          printf("Kargo Rotası (sehir): ");
+          scanf("%s", sehir_adi);
+          if (cityExists(routes, sehir_adi)) {
+            sehir_id = find_city_id(routes, sehir_adi);
             break;
+          } else {
+            printf("Hata: Girilen sehir rota agacinda bulunamadi!\n");
+            printf("Mevcut sehirler:\n");
+            routesPrint(routes);
+            printf("Lutfen listeden gecerli bir sehir giriniz.\n");
           }
         }
-        if (!found) {
-          printf("Belirtilen ID'ye sahip kargo bulunamadı.\n");
+        suresi = findShortestPath(routes, sehir_id);
+        struct Kargo *yeni_k = yeni_kargo(teslim_tarihi, durum, suresi, sehir_id, sehir_adi);
+        push(&kargo_stack, yeni_k);
+        if (musteri->kargo_listesi == NULL) {
+          musteri->kargo_listesi = yeni_k;
+        } else {
+          yeni_k->next = musteri->kargo_listesi;
+          musteri->kargo_listesi = yeni_k;
         }
-      }
-      break;
-    }
-    case 4: {
-      char musteri_adi_soyadi[50];
-      printf("MC<Eteri adD1 soyadD1: ");
-      scanf(" %[^\n]", musteri_adi_soyadi);
-      struct Musteri *musteri = musteri_bul(musteriler, musteri_adi_soyadi);
-      if (musteri == NULL) {
-        printf("MC<Eteri bulunamadD1.\n");
-      } else {
-        printLastFive(&kargo_stack);
-      }
-      break;
-    }
-    case 5: {
-      struct Musteri *current_musteri = musteriler;
-      if (current_musteri == NULL) {
-        printf("Hiç müşteri bulunmamaktadır.\n");
         break;
       }
-
-      // Create two linked lists for delivered and undelivered cargos
-      struct Kargo *teslim_edilmis = NULL;
-      struct Kargo *teslim_edilmemis = NULL;
-      int kargo_sayisi = 0;
-
-      // Iterate through all customers and their cargos
-      while (current_musteri != NULL) {
-        struct Kargo *musteri_kargosu = current_musteri->kargo_listesi;
-
-        while (musteri_kargosu != NULL) {
-          kargo_sayisi++;
-          struct Kargo *current = (struct Kargo *)malloc(sizeof(struct Kargo));
-          memcpy(current, musteri_kargosu, sizeof(struct Kargo));
-          current->next = NULL;
-
-          if (strcmp(current->kargo_durum, "Teslim Edildi") == 0) {
-            // Add to delivered list (sorted by kargo_id)
-            if (teslim_edilmis == NULL ||
-                current->kargo_id < teslim_edilmis->kargo_id) {
-              current->next = teslim_edilmis;
-              teslim_edilmis = current;
-            } else {
-              struct Kargo *temp = teslim_edilmis;
-              while (temp->next != NULL &&
-                     temp->next->kargo_id < current->kargo_id) {
-                temp = temp->next;
-              }
-              current->next = temp->next;
-              temp->next = current;
-            }
+      case 3: {
+        char musteri_adi_soyadi[50];
+        int kargo_id;
+        printf("Musteri adi soyadi: ");
+        scanf(" %s", musteri_adi_soyadi);
+        struct Musteri *musteri = musteri_bul(musteriler, musteri_adi_soyadi);
+        if (musteri == NULL) {
+          printf("Musteri bulunamadi.\n");
+          break;
+        }
+        printf("Kargo ID: ");
+        scanf("%d", &kargo_id);
+        if (isempty(&kargo_stack)) {
+          printf("Hic kargo bulunmamaktadir.\n");
+        } else {
+          qsort(kargo_stack.item, kargo_stack.top + 1, sizeof(struct Kargo *), compare);
+          struct Kargo *found_kargo = binarySearch(&kargo_stack, kargo_id);
+          if (found_kargo != NULL) {
+            printf("\nKargo Durumu:\n");
+            printf("Musteri: %s\n", musteri_adi_soyadi);
+            printf("Kargo ID: %d\n", found_kargo->kargo_id);
+            printf("Gonderi Tarihi: %s\n", found_kargo->kargo_teslim_tarihi);
+            printf("Durum: %s\n", found_kargo->kargo_durum);
+            printf("sehir: %s\n", found_kargo->rota.sehir_adi);
+            printf("Teslimat Suresi: %d gun\n", found_kargo->kargo_suresi);
           } else {
-            // Add to undelivered list (will be sorted by delivery time)
-            if (teslim_edilmemis == NULL) {
-              teslim_edilmemis = current;
-            } else {
-              current->next = teslim_edilmemis;
-              teslim_edilmemis = current;
-            }
+            printf("Belirtilen ID'ye sahip kargo bulunamadi.\n");
           }
-
-          musteri_kargosu = musteri_kargosu->next;
+        }
+        break;
+      }
+     case 4: {
+    char musteri_adi_soyadi[50];
+    printf("Musteri adi soyadi: ");
+    scanf(" %s", musteri_adi_soyadi);
+    struct Musteri *musteri = musteri_bul(musteriler, musteri_adi_soyadi);
+    if (musteri == NULL) {
+        printf("Musteri bulunamadi.\n");
+    } else {
+        printLastFive(&kargo_stack);
+    }
+    break;
+}
+case 5: {
+    struct Musteri *current_musteri = musteriler;
+    if (current_musteri == NULL) {
+        printf("Hic musteri bulunmamaktadir.\n");
+        break;
+    }
+    struct Kargo *teslim_edilmis = NULL;
+    struct Kargo *teslim_edilmemis = NULL;
+    int kargo_sayisi = 0;
+    while (current_musteri != NULL) {
+        struct Kargo *musteri_kargosu = current_musteri->kargo_listesi;
+        while (musteri_kargosu != NULL) {
+            kargo_sayisi++;
+            struct Kargo *current = (struct Kargo *)malloc(sizeof(struct Kargo));
+            memcpy(current, musteri_kargosu, sizeof(struct Kargo));
+            current->next = NULL;
+            if (strcmp(current->kargo_durum, "Teslim Edildi") == 0) {
+        
+                if (teslim_edilmis == NULL || current->kargo_id < teslim_edilmis->kargo_id) {
+                    current->next = teslim_edilmis;
+                    teslim_edilmis = current;
+                } else {
+                    struct Kargo *temp = teslim_edilmis;
+                    while (temp->next != NULL && temp->next->kargo_id < current->kargo_id) {
+                        temp = temp->next;
+                    }
+                    current->next = temp->next;
+                    temp->next = current;
+                }
+            } else {
+                
+                if (teslim_edilmemis == NULL) {
+                    teslim_edilmemis = current;
+                } else {
+                    current->next = teslim_edilmemis;
+                    teslim_edilmemis = current;
+                }
+            }
+            musteri_kargosu = musteri_kargosu->next;
         }
         current_musteri = current_musteri->next;
-      }
-
-      if (kargo_sayisi == 0) {
-        printf("Hiç kargo bulunmamaktadır.\n");
+    }
+    if (kargo_sayisi == 0) {
+        printf("Hic kargo bulunmamaktadir.\n");
         break;
-      }
-
-      // Sort undelivered cargos by delivery time using merge sort
-      if (teslim_edilmemis != NULL) {
+    }
+    
+    if (teslim_edilmemis != NULL) {
         mergeSort(&teslim_edilmemis);
-      }
-
-      // Print delivered cargos
-      printf("\nTeslim Edilmiş Kargolar (Kargo ID'ye göre sıralı):\n");
-      printf("------------------------------------------------\n");
-      struct Kargo *current = teslim_edilmis;
-      while (current != NULL) {
+    }
+    
+    printf("\nTeslim Edilmis Kargolar (Kargo ID'ye gore sirali):\n");
+    printf("------------------------------------------------\n");
+    struct Kargo *current = teslim_edilmis;
+    while (current != NULL) {
         printf("Kargo ID: %d\n", current->kargo_id);
-        printf("Gönderi Tarihi: %s\n", current->kargo_teslim_tarihi);
-        printf("Şehir: %s\n", current->rota.sehir_adi);
-        printf("Teslimat Süresi: %d gün\n", current->kargo_suresi);
+        printf("Gonderi Tarihi: %s\n", current->kargo_teslim_tarihi);
+        printf("sehir: %s\n", current->rota.sehir_adi);
+        printf("Teslimat Suresi: %d gun\n", current->kargo_suresi);
         printf("------------------------------------------------\n");
         current = current->next;
-      }
+    }
 
-      // Print undelivered cargos
-      printf("\nTeslim Edilmemiş Kargolar (Teslimat süresine göre sıralı):\n");
-      printf("------------------------------------------------\n");
-      current = teslim_edilmemis;
-      while (current != NULL) {
+    printf("\nTeslim Edilmemis Kargolar (Teslimat suresine gore sirali):\n");
+    printf("------------------------------------------------\n");
+    current = teslim_edilmemis;
+    while (current != NULL) {
         printf("Kargo ID: %d\n", current->kargo_id);
-        printf("Gönderi Tarihi: %s\n", current->kargo_teslim_tarihi);
+        printf("Gonderi Tarihi: %s\n", current->kargo_teslim_tarihi);
         printf("Durum: %s\n", current->kargo_durum);
-        printf("Şehir: %s\n", current->rota.sehir_adi);
-        printf("Teslimat Süresi: %d gün\n", current->kargo_suresi);
+        printf("sehir: %s\n", current->rota.sehir_adi);
+        printf("Teslimat Suresi: %d gun\n", current->kargo_suresi);
         printf("------------------------------------------------\n");
         current = current->next;
-      }
-
-      // Free allocated memory
-      while (teslim_edilmis != NULL) {
+    }
+    
+    while (teslim_edilmis != NULL) {
         struct Kargo *temp = teslim_edilmis;
         teslim_edilmis = teslim_edilmis->next;
         free(temp);
-      }
-      while (teslim_edilmemis != NULL) {
+    }
+    while (teslim_edilmemis != NULL) {
         struct Kargo *temp = teslim_edilmemis;
         teslim_edilmemis = teslim_edilmemis->next;
         free(temp);
-      }
-      break;
     }
-    case 6:
-      routesPrint(routes);
-      break;
-    case 7:
-      printf("Bizi tercih ettiDiniz iC'in teEekkC<r ederiz, iyi gC<nler!\n");
-      break;
-    default:
-      printf("GeC'ersiz seC'im. LC<tfen tekrar deneyin.\n");
-    }
-
+    break;
+}
+case 6:
+    routesPrint(routes);
+    break;
+case 7:
+    printf("Bizi tercih ettiginiz icin tesekkur ederiz, iyi gunler!\n");
+    break;
+default:
+    printf("Gecersiz secim. Lutfen tekrar deneyin.\n");
+}
+      
   } while (choice != 7);
-
   return 0;
 }
